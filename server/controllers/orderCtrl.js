@@ -15,53 +15,50 @@ const createOrderCtrl = async (req, res) => {
       city,
       phone,
       user,
+      email,
       isPaid,
       paidAt,
-      email,
-    } = req.body;
+    } = req.body; // ✅ Sửa tại đây
 
-    //await sendEmailCreateOrder(user.email, orderItems);
-    // ✅ Kiểm tra dữ liệu đầu vào
-    if (
-      !paymentMethod ||
-      !itemsPrice ||
-      !shippingPrice ||
-      !totalPrice ||
-      !fullname ||
-      !address ||
-      !city ||
-      !phone ||
-      !user
-    ) {
-      return res.status(400).json({ message: "Yêu cầu nhập đủ thông tin!" });
-    }
+    const promises = orderItems.map(async (order) => {
+      const productData = await ProductModel.findOneAndUpdate(
+        {
+          _id: order.product,
+          countInStock: { $gte: order.amount },
+        },
+        {
+          $inc: {
+            countInStock: -order.amount,
+            selled: +order.amount,
+          },
+        },
+        { new: true }
+      );
 
-    // ✅ Kiểm tra tồn kho từng sản phẩm
-    for (const order of orderItems) {
-      const productData = await ProductModel.findById(order.product);
-      if (!productData || productData.countInStock < order.amount) {
-        return res.status(400).json({
-          status: "ERR",
-          message: `Sản phẩm ${order.product} không đủ hàng`,
-        });
+      if (!productData) {
+        return { id: order.product };
       }
-    }
+    });
 
-    // ✅ Giảm tồn kho sau khi kiểm tra
-    for (const order of orderItems) {
-      await ProductModel.findByIdAndUpdate(order.product, {
-        $inc: { countInStock: -order.amount, selled: order.amount },
+    const results = await Promise.all(promises);
+
+    const failedProducts = results.filter((item) => item !== undefined);
+    if (failedProducts.length > 0) {
+      const arrId = failedProducts.map((item) => item.id);
+      return res.status(400).json({
+        status: "ERR",
+        message: `Sản phẩm ${arrId.join(", ")} không đủ hàng`,
       });
     }
 
-    // ✅ Tạo mã đơn hàng ngẫu nhiên
+    // Tạo mã đơn hàng
     const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
     const orderCodeId = `DH${datePart}-${randomPart}`;
 
-    // ✅ Tạo mới đơn hàng
+    // Tạo mới đơn hàng
     const newOrder = await OrderModel.create({
-      orderCodeId, // ✅ thêm thẳng vào đây
+      orderCodeId,
       orderItems,
       shippingAddress: { fullName: fullname, address, city, phone },
       paymentMethod,
@@ -73,11 +70,12 @@ const createOrderCtrl = async (req, res) => {
       paidAt,
     });
 
-    // ✅ Trả về dữ liệu cho frontend
+    await sendEmailCreateOrder(email, orderItems);
+
     return res.status(201).json({
       status: "OK",
       message: "Đặt hàng thành công!",
-      orderCodeId: newOrder.orderCodeId, // Trả về mã đơn hàng chính xác
+      orderCodeId,
       order: newOrder,
     });
   } catch (error) {
@@ -85,6 +83,27 @@ const createOrderCtrl = async (req, res) => {
     return res.status(500).json({
       status: "ERR",
       message: error.message || "Server error",
+    });
+  }
+};
+
+const getAllOrderCtrl = async (req, res) => {
+  try {
+    // Tìm đơn hàng theo ID và populate thông tin user
+    const orders = await OrderModel.find();
+    if (!orders) {
+      return res.status(404).json({
+        message: "Không tìm thấy đơn hàng!",
+      });
+    }
+    return res.status(200).json({
+      message: "Lấy tất cả đơn hàng thành công",
+      data: orders,
+    });
+  } catch (e) {
+    console.error("Lỗi khi lấy đơn hàng:", e);
+    return res.status(500).json({
+      message: e.message || "Lỗi server khi lấy đơn hàng",
     });
   }
 };
@@ -183,6 +202,7 @@ const cancelOrderCtrl = async (req, res) => {
 
 module.exports = {
   createOrderCtrl,
+  getAllOrderCtrl,
   getAllOrderDetailCtrl,
   getOrderDetailCtrl,
   cancelOrderCtrl,

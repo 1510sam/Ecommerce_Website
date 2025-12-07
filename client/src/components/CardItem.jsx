@@ -32,23 +32,15 @@ const CardItem = (props) => {
   const navigate = useNavigate();
 
   const handleGetDetailsProduct = (id) => {
-    if (countInStock > 0) {
-      navigate(`product/detail/${id}`);
-    }
+    navigate(`product/detail/${id}`); // ❗ Luôn cho xem chi tiết
   };
-
-  const isOutOfStock = countInStock === 0;
 
   return (
     <Card
       onClick={() => handleGetDetailsProduct(id)}
-      className={`relative w-full max-w-[14rem] h-full rounded-xl shadow-md border border-gray-200 overflow-hidden transform transition duration-300 
-        ${
-          isOutOfStock
-            ? "opacity-50 cursor-not-allowed"
-            : "cursor-pointer hover:scale-105 hover:shadow-lg"
-        }
-        bg-white flex flex-col`}
+      className={`relative w-full max-w-[14rem] h-full rounded-xl shadow-md border border-gray-200 overflow-hidden 
+        cursor-pointer hover:scale-105 hover:shadow-lg
+        bg-white flex flex-col transition duration-300`}
     >
       {/* Badge Giảm giá */}
       {hasValidDiscount && (
@@ -61,6 +53,13 @@ const CardItem = (props) => {
       <Box className="absolute top-0 right-0 bg-blue-100 text-blue-700 text-[10px] font-semibold px-2 py-1 rounded-bl-md z-10 border border-blue-400">
         Trả góp 0%
       </Box>
+
+      {/* Badge Hết hàng */}
+      {countInStock < 1 && (
+        <Box className="absolute bottom-0 left-0 right-0 bg-gray-900/80 text-white text-[11px] py-1 text-center z-10">
+          Đợi hàng mới về
+        </Box>
+      )}
 
       {/* Ảnh sản phẩm */}
       <CardMedia
@@ -76,38 +75,17 @@ const CardItem = (props) => {
         {/* Tên sản phẩm */}
         <Typography
           variant="body2"
-          className="text-gray-800 font-medium leading-snug text-sm line-clamp-2 min-h-[40px]" // 👈 fix chiều cao tên
+          className="text-gray-800 font-medium leading-snug text-sm line-clamp-2 min-h-[40px]"
         >
           {productName}
         </Typography>
 
-        {countInStock === 1 && (
-          <Typography
-            variant="caption"
-            className="bg-gray-100 text-gray-700 text-[11px] rounded px-1.5 py-0.5 mt-1 inline-block min-h-[20px]"
-          >
-            Sắp hết hàng
-          </Typography>
-        )}
-
-        {countInStock < 1 && (
-          <Typography
-            variant="caption"
-            className="bg-gray-100 text-gray-700 text-[11px] rounded px-1.5 py-0.5 mt-1 inline-block min-h-[20px]"
-          >
-            Đợi hàng mới về
-          </Typography>
-        )}
-
-        {/* Giá và giá gốc */}
+        {/* Giá */}
         <div className="mt-1 flex flex-wrap items-baseline gap-x-1 min-h-[28px]">
           {hasValidDiscount ? (
             <>
               <span className="text-red-600 font-bold text-base">
-                {typeof price === "number" && !isNaN(price)
-                  ? convertPrice(price)
-                  : "0"}
-                ₫
+                {convertPrice(price)}₫
               </span>
               <span className="line-through text-gray-500 text-xs">
                 {originalPrice.toLocaleString()}₫
@@ -115,15 +93,12 @@ const CardItem = (props) => {
             </>
           ) : (
             <span className="text-red-600 font-bold text-base">
-              {typeof price === "number" && !isNaN(price)
-                ? convertPrice(price)
-                : "0"}
-              ₫
+              {convertPrice(price)}₫
             </span>
           )}
         </div>
 
-        {/* Mô tả sản phẩm */}
+        {/* Mô tả */}
         <Typography
           variant="caption"
           className="bg-gray-100 text-gray-700 text-[11px] rounded px-1.5 py-0.5 mt-1 inline-block min-h-[20px]"
@@ -133,7 +108,7 @@ const CardItem = (props) => {
             : description || ""}
         </Typography>
 
-        {/* Đánh giá & Yêu thích (dính dưới cùng) */}
+        {/* Rating + Favorite */}
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center space-x-0.5 text-yellow-400">
             {Array.from({ length: rating || 0 }, (_, i) => (

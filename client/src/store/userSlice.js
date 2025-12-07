@@ -10,6 +10,7 @@ const initialState = {
   accessToken: "",
   id: "",
   city: "",
+  refreshToken: "",
   isAdmin: false,
 };
 
@@ -32,6 +33,7 @@ export const userSlice = createSlice({
         accessToken,
         _id,
         city,
+        refreshToken,
         isAdmin,
       } = action.payload;
       state.email = email;
@@ -42,6 +44,7 @@ export const userSlice = createSlice({
       state.accessToken = accessToken;
       state.id = _id;
       state.city = city;
+      state.refreshToken = refreshToken;
       state.isAdmin = isAdmin;
       //Object.assign(state, userData);
     },

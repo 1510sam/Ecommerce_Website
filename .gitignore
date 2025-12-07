@@ -1,2 +1,5 @@
+.env
+client/.env
+server/.env
 node_modules
 package_lock.json

@@ -24,6 +24,18 @@ export const getAllOrderByUserId = async (token, id) => {
   return res.data;
 };
 
+export const getAllOrders = async (token) => {
+  const res = await axiosJWT.get(
+    `${import.meta.env.VITE_API_URL_BACKEND}/order/get-all`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
 export const getOrderDetail = async (token, id) => {
   const res = await axiosJWT.get(
     `${import.meta.env.VITE_API_URL_BACKEND}/order/get-detail-order/${id}`,

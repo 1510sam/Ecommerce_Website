@@ -154,11 +154,14 @@ const PaymentPage = () => {
         shippingPrice: shippingFee,
         totalPrice,
         user: user?.id,
+        email: user?.email, // <-- FIX QUAN TRỌNG
         isPaid: true,
         paidAt: new Date(),
       },
       {
         onSuccess: (data) => {
+          console.log("Data rendering: ", data);
+
           Swal.fire({
             icon: "success",
             title: "Đặt hàng thành công!",
@@ -361,7 +364,7 @@ const PaymentPage = () => {
                         purchase_units: [
                           {
                             amount: {
-                              value: (totalPrice / 30000).toFixed(2), // quy đổi sang USD
+                              value: Math.round(totalPrice / 30000), // quy đổi sang USD
                             },
                           },
                         ],

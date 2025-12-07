@@ -64,8 +64,10 @@ function App() {
   );
 
   const handleGetDetailUser = async (userId, token) => {
+    const storageRefreshToken = localStorage.getItem("refresh_token");
+    const refreshToken = JSON.parse(storageRefreshToken);
     const res = await UserService.getDetailUser(userId, token);
-    dispatch(updateUser({ ...res?.data, accessToken: token }));
+    dispatch(updateUser({ ...res?.data, accessToken: token, refreshToken }));
   };
 
   // Auto logout sau khi token hết hạn

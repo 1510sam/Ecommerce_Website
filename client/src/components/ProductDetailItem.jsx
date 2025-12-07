@@ -12,6 +12,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { addOrderProduct, resetOrder } from "~/store/orderSlice";
 import Swal from "sweetalert2";
 import { convertPrice } from "~/util";
+import LikeButton from "./LikeButton";
+import CommentButton from "./CommentButton";
 const ProductDetailItem = ({ idProduct }) => {
   const [numProduct, setNumProduct] = useState(1);
   const [errorLimitOrder, setErrorLimitOrder] = useState(false);
@@ -74,7 +76,10 @@ const ProductDetailItem = ({ idProduct }) => {
       return;
     }
 
-    if (orderRedux.amount + numProduct <= orderRedux.countInStock) {
+    if (
+      orderRedux.amount + numProduct <= orderRedux.countInStock ||
+      !orderRedux
+    ) {
       setErrorLimitOrder(false);
     } else {
       setErrorLimitOrder(true);
@@ -225,6 +230,12 @@ const ProductDetailItem = ({ idProduct }) => {
             </span>
           </div>
 
+          <div className="mt-2">
+            <LikeButton
+              dataRef={"https://developers.facebook.com/docs/plugins/"}
+            />
+          </div>
+
           <div
             style={{
               margin: "10px 0 20px",
@@ -261,8 +272,8 @@ const ProductDetailItem = ({ idProduct }) => {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex justify-around gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
               <Button
                 size="large"
                 className="h-12 w-[220px] border-none rounded !text-white font-bold !bg-[rgb(255,57,59)]"
@@ -270,9 +281,7 @@ const ProductDetailItem = ({ idProduct }) => {
               >
                 Thêm vào giỏ hàng
               </Button>
-              {errorLimitOrder && (
-                <div className="text-red-500">Sản phẩm đã hết hàng</div>
-              )}
+
               <Button
                 sx={{ border: "1px solid rgb(13,92,182)" }}
                 size="large"
@@ -281,8 +290,29 @@ const ProductDetailItem = ({ idProduct }) => {
                 Mua trả sau
               </Button>
             </div>
+
+            {/* Text nằm bên dưới */}
+            {errorLimitOrder && (
+              <div className="text-red-500 ml-1">Sản phẩm đã hết hàng</div>
+            )}
           </div>
         </Col>
+        <div className="w-full mt-10">
+          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            {/* Header title */}
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+              Bình luận sản phẩm
+            </h2>
+
+            {/* Facebook Comment Plugin */}
+            <div className="mt-4">
+              <CommentButton
+                width="100%"
+                dataRef="https://developers.facebook.com/docs/plugins/comments#configurator"
+              />
+            </div>
+          </div>
+        </div>
       </Row>
     </Loading>
   );

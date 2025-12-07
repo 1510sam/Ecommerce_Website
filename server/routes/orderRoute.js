@@ -5,11 +5,14 @@ const {
   getAllOrderDetailCtrl,
   getOrderDetailCtrl,
   cancelOrderCtrl,
+  getAllOrderCtrl,
 } = require("../controllers/orderCtrl");
 
 const router = express.Router();
 
 router.post("/create", authMiddleware.protectRoute, createOrderCtrl);
+
+router.get("/get-all", authMiddleware.protectRoute, getAllOrderCtrl);
 
 router.get(
   "/get-all-order/:id",

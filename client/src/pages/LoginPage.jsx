@@ -60,6 +60,7 @@ const LoginPage = () => {
               navigate("/");
             }
             localStorage.setItem("access_token", data?.accessToken);
+            localStorage.setItem("refresh_token", data?.refreshToken);
             if (data?.accessToken) {
               const decoded = jwtDecode(data?.accessToken);
               if (decoded?.userId) {
@@ -81,8 +82,10 @@ const LoginPage = () => {
   };
 
   const handleGetDetailUser = async (userId, token) => {
+    const storage = localStorage.getItem("refresh_token");
+    const refreshToken = JSON.parse(storage);
     const res = await UserService.getDetailUser(userId, token);
-    dispatch(updateUser({ ...res?.data, accessToken: token }));
+    dispatch(updateUser({ ...res?.data, accessToken: token, refreshToken }));
   };
 
   const getBackendErrorMessage = () =>

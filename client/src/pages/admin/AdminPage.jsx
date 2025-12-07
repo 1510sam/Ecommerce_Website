@@ -1,6 +1,11 @@
-import { ProductOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ProductOutlined,
+  UserOutlined,
+  OrderedListOutlined,
+} from "@ant-design/icons";
 import { Menu } from "antd";
 import React, { useState } from "react";
+import AdminOrder from "~/components/AdminOrder/AdminOrder";
 import AdminProduct from "~/components/AdminProduct/AdminProduct";
 import AdminUser from "~/components/AdminUser/AdminUser";
 import Header from "~/components/Header";
@@ -16,6 +21,11 @@ const items = [
     icon: <ProductOutlined />,
     label: "Sản phẩm",
   },
+  {
+    key: "order",
+    icon: <OrderedListOutlined />,
+    label: "Đơn hàng",
+  },
 ];
 
 const AdminPage = () => {
@@ -27,6 +37,8 @@ const AdminPage = () => {
         return <AdminUser />;
       case "product":
         return <AdminProduct />;
+      case "order":
+        return <AdminOrder />;
       default:
         return <></>;
     }

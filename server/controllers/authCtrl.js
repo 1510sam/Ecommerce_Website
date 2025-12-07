@@ -92,7 +92,7 @@ const signinCtrl = async (req, res) => {
     const { refreshToken: token, ...newResponse } = responseData;
 
     // Gửi response ko có refreshToken
-    return res.status(200).json(newResponse);
+    return res.status(200).json(newResponse, refreshToken);
   } catch (e) {
     console.error(e); // in lỗi chi tiết ra console
     return res.status(500).json({ message: e.message || "Server error" });

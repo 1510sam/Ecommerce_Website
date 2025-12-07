@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const generateAcessToken = (userId, res) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: "1h", // token hết hạn sau 1 giờ
+    expiresIn: "30s", // token hết hạn sau 1 giờ
   });
   res.cookie("access_token", token, {
     maxAge: 60 * 60 * 1000, // 1 giờ
